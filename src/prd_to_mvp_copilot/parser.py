@@ -32,6 +32,22 @@ def extract_requirements(prd_text: str) -> list[Requirement]:
     return reqs
 
 
+def map_section_to_milestone(section: str, category: str) -> str:
+    lower = section.lower()
+    if any(token in lower for token in ("auth", "core", "foundation", "account")):
+        return "M1-foundation"
+    if any(token in lower for token in ("integration", "api", "backend", "data")):
+        return "M2-integrations"
+    if any(token in lower for token in ("ui", "dashboard", "frontend", "experience")):
+        return "M3-experience"
+
+    if category == "backend":
+        return "M2-integrations"
+    if category == "frontend":
+        return "M3-experience"
+    return "M1-foundation"
+
+
 def build_task_matrix(requirements: list[Requirement]) -> list[dict[str, str]]:
     matrix = []
     for i, req in enumerate(requirements, start=1):
@@ -50,9 +66,38 @@ def build_task_matrix(requirements: list[Requirement]) -> list[dict[str, str]]:
             {
                 "id": f"REQ-{i:03d}",
                 "section": req.section,
+                "milestone": map_section_to_milestone(req.section, category),
                 "requirement": req.text,
                 "category": category,
                 "test_hint": test_hint,
             }
         )
     return matrix
+
+
+def matrix_json_schema() -> dict[str, object]:
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "PRD to MVP task matrix",
+        "type": "array",
+        "items": {
+            "type": "object",
+            "required": [
+                "id",
+                "section",
+                "milestone",
+                "requirement",
+                "category",
+                "test_hint",
+            ],
+            "properties": {
+                "id": {"type": "string", "pattern": "^REQ-\\d{3}$"},
+                "section": {"type": "string", "minLength": 1},
+                "milestone": {"type": "string", "pattern": "^M[1-3]-"},
+                "requirement": {"type": "string", "minLength": 1},
+                "category": {"type": "string", "enum": ["backend", "frontend", "core"]},
+                "test_hint": {"type": "string", "minLength": 1},
+            },
+            "additionalProperties": False,
+        },
+    }

@@ -4,8 +4,9 @@ Turn product requirements into runnable MVP scaffolds.
 
 ## What ships in v0.1
 - PRD markdown parser for bullet/numbered requirements
-- Task-matrix generator with category + test hints
+- Task-matrix generator with category + milestone mapping + test hints
 - CLI (`prd-mvp`) outputting JSON or Markdown table
+- Optional JSON Schema export for downstream validators/contracts
 - Demo PRD and pytest coverage
 
 ## Quickstart
@@ -15,17 +16,17 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -e '.[dev]'
 pytest
-prd-mvp demo/sample_prd.md --format md
+prd-mvp demo/sample_prd.md --format md --schema-out demo/task_matrix.schema.json
 ```
 
 ## Example output
 
 ```text
-| id | section | category | requirement | test_hint |
-|---|---|---|---|---|
-| REQ-001 | Core jobs | backend | User can login and reset password | auth flow passes |
-| REQ-002 | Core jobs | frontend | Dashboard UI shows weekly activation trend | render and interaction snapshot |
-| REQ-003 | Core jobs | core | Export account activity CSV | acceptance criteria validated |
+| id | section | milestone | category | requirement | test_hint |
+|---|---|---|---|---|---|
+| REQ-001 | Core jobs | M1-foundation | backend | User can login and reset password | auth flow passes |
+| REQ-002 | Core jobs | M1-foundation | frontend | Dashboard UI shows weekly activation trend | render and interaction snapshot |
+| REQ-003 | Core jobs | M1-foundation | core | Export account activity CSV | acceptance criteria validated |
 ```
 
 ## Repo structure
