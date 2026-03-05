@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "prd-to-mvp-copilot"
+version = "0.1.0"
+description = "Turn PRD markdown into an MVP task matrix"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{name = "Kerry"}]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+prd-mvp = "prd_to_mvp_copilot.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
