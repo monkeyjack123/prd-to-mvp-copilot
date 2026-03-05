@@ -27,11 +27,11 @@ def main() -> None:
     if args.format == "json":
         print(json.dumps(matrix, indent=2))
     else:
-        print("| id | section | milestone | category | requirement | test_hint |")
-        print("|---|---|---|---|---|---|")
+        print("| id | section | milestone | category | priority | requirement | test_hint |")
+        print("|---|---|---|---|---|---|---|")
         for row in matrix:
             print(
-                f"| {row['id']} | {row['section']} | {row['milestone']} | {row['category']} | {row['requirement']} | {row['test_hint']} |"
+                f"| {row['id']} | {row['section']} | {row['milestone']} | {row['category']} | {row['priority']} | {row['requirement']} | {row['test_hint']} |"
             )
 
 

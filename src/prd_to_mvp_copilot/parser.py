@@ -48,6 +48,15 @@ def map_section_to_milestone(section: str, category: str) -> str:
     return "M1-foundation"
 
 
+def infer_priority(requirement_text: str) -> str:
+    lower = requirement_text.lower()
+    if any(token in lower for token in ("must", "critical", "required", "blocker", "p0")):
+        return "high"
+    if any(token in lower for token in ("should", "important", "p1")):
+        return "medium"
+    return "low"
+
+
 def build_task_matrix(requirements: list[Requirement]) -> list[dict[str, str]]:
     matrix = []
     for i, req in enumerate(requirements, start=1):
@@ -69,6 +78,7 @@ def build_task_matrix(requirements: list[Requirement]) -> list[dict[str, str]]:
                 "milestone": map_section_to_milestone(req.section, category),
                 "requirement": req.text,
                 "category": category,
+                "priority": infer_priority(req.text),
                 "test_hint": test_hint,
             }
         )
@@ -88,6 +98,7 @@ def matrix_json_schema() -> dict[str, object]:
                 "milestone",
                 "requirement",
                 "category",
+                "priority",
                 "test_hint",
             ],
             "properties": {
@@ -96,6 +107,7 @@ def matrix_json_schema() -> dict[str, object]:
                 "milestone": {"type": "string", "pattern": "^M[1-3]-"},
                 "requirement": {"type": "string", "minLength": 1},
                 "category": {"type": "string", "enum": ["backend", "frontend", "core"]},
+                "priority": {"type": "string", "enum": ["high", "medium", "low"]},
                 "test_hint": {"type": "string", "minLength": 1},
             },
             "additionalProperties": False,

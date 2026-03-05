@@ -5,6 +5,7 @@ from prd_to_mvp_copilot.parser import (
     build_task_matrix,
     map_section_to_milestone,
     matrix_json_schema,
+    infer_priority,
 )
 
 
@@ -23,12 +24,12 @@ def test_extract_requirements_reads_bullets_and_numbered_items():
     ]
 
 
-def test_build_task_matrix_assigns_categories_and_milestones():
+def test_build_task_matrix_assigns_categories_milestones_and_priority():
     text = """
 # Core jobs
-- Implement auth middleware
+- Must implement auth middleware
 # Dashboard
-- Create dashboard UI
+- Should create dashboard UI
 # Misc
 - Add billing webhook
 """
@@ -40,6 +41,9 @@ def test_build_task_matrix_assigns_categories_and_milestones():
     assert matrix[1]["milestone"] == "M3-experience"
     assert matrix[2]["milestone"] == "M1-foundation"
     assert matrix[0]["id"] == "REQ-001"
+    assert matrix[0]["priority"] == "high"
+    assert matrix[1]["priority"] == "medium"
+    assert matrix[2]["priority"] == "low"
 
 
 def test_map_section_to_milestone_uses_section_and_category_fallbacks():
@@ -47,12 +51,20 @@ def test_map_section_to_milestone_uses_section_and_category_fallbacks():
     assert map_section_to_milestone("Random", "frontend") == "M3-experience"
 
 
+def test_infer_priority_with_keywords_and_default():
+    assert infer_priority("Critical: support migration") == "high"
+    assert infer_priority("Should support export") == "medium"
+    assert infer_priority("Polish onboarding copy") == "low"
+
+
 def test_matrix_json_schema_contract_has_required_fields():
     schema = matrix_json_schema()
     items = schema["items"]
     assert schema["type"] == "array"
     assert "milestone" in items["required"]
+    assert "priority" in items["required"]
     assert items["properties"]["category"]["enum"] == ["backend", "frontend", "core"]
+    assert items["properties"]["priority"]["enum"] == ["high", "medium", "low"]
     assert items["additionalProperties"] is False
 
     json.dumps(schema)

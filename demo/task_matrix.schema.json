@@ -10,6 +10,7 @@
       "milestone",
       "requirement",
       "category",
+      "priority",
       "test_hint"
     ],
     "properties": {
@@ -35,6 +36,14 @@
           "backend",
           "frontend",
           "core"
+        ]
+      },
+      "priority": {
+        "type": "string",
+        "enum": [
+          "high",
+          "medium",
+          "low"
         ]
       },
       "test_hint": {
