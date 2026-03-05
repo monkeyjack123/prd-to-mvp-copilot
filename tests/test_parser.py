@@ -24,6 +24,19 @@ def test_extract_requirements_reads_bullets_and_numbered_items():
     ]
 
 
+def test_extract_requirements_normalizes_task_list_checkboxes():
+    text = """
+# Scope
+- [ ] Must support GitHub task lists
+- [x] Should keep completed items parseable
+"""
+    reqs = extract_requirements(text)
+    assert [r.text for r in reqs] == [
+        "Must support GitHub task lists",
+        "Should keep completed items parseable",
+    ]
+
+
 def test_build_task_matrix_assigns_categories_milestones_and_priority():
     text = """
 # Core jobs

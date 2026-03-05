@@ -22,6 +22,7 @@ def extract_requirements(prd_text: str) -> list[Requirement]:
             continue
         if line.startswith(("- ", "* ")):
             text = line[2:].strip()
+            text = re.sub(r"^\[[ xX]\]\s*", "", text)
             if text:
                 reqs.append(Requirement(section=section, text=text))
             continue
