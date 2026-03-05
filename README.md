@@ -3,7 +3,7 @@
 Turn product requirements into runnable MVP scaffolds.
 
 ## What ships in v0.1
-- PRD markdown parser for bullet/numbered requirements (including GitHub task-list checkboxes)
+- PRD markdown parser for bullet/numbered requirements (supports `1.`/`1)`/`a)` formats, plus GitHub task-list checkboxes)
 - Task-matrix generator with category + milestone mapping + test hints
 - Priority inference (`high`/`medium`/`low`) from requirement language (`must`, `critical`, `should`, etc.)
 - CLI (`prd-mvp`) outputting JSON or Markdown table

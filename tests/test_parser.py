@@ -15,12 +15,16 @@ def test_extract_requirements_reads_bullets_and_numbered_items():
 - User can login with email
 - Dashboard shows KPI cards
 1. Export CSV report
+2) Send report by email
+a) Include weekly digest mode
 """
     reqs = extract_requirements(text)
     assert [r.text for r in reqs] == [
         "User can login with email",
         "Dashboard shows KPI cards",
         "Export CSV report",
+        "Send report by email",
+        "Include weekly digest mode",
     ]
 
 

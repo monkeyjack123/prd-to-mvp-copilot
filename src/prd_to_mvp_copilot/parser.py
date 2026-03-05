@@ -27,8 +27,8 @@ def extract_requirements(prd_text: str) -> list[Requirement]:
                 reqs.append(Requirement(section=section, text=text))
             continue
 
-        if re.match(r"^\d+\.\s+", line):
-            text = re.sub(r"^\d+\.\s+", "", line)
+        if re.match(r"^(\d+[\.)]|[a-zA-Z][\.)])\s+", line):
+            text = re.sub(r"^(\d+[\.)]|[a-zA-Z][\.)])\s+", "", line)
             reqs.append(Requirement(section=section, text=text))
     return reqs
 
