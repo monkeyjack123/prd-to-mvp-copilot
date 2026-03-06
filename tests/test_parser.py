@@ -7,6 +7,8 @@ from prd_to_mvp_copilot.parser import (
     matrix_json_schema,
     infer_priority,
     infer_effort,
+    extract_section_headings,
+    validate_required_sections,
 )
 
 
@@ -101,6 +103,40 @@ def test_infer_effort_with_keywords_and_default():
     assert infer_effort("Implement OAuth SSO integration") == "large"
     assert infer_effort("Create analytics dashboard") == "medium"
     assert infer_effort("Fix typo in docs") == "small"
+
+
+def test_extract_section_headings_skips_code_block_headings():
+    text = """
+# Problem
+~~~md
+# Not a real section heading
+~~~
+## Users
+### Features
+"""
+    assert extract_section_headings(text) == ["Problem", "Users", "Features"]
+
+
+def test_validate_required_sections_is_case_insensitive():
+    text = """
+# problem
+# USERS
+# Goals
+# Features
+"""
+    result = validate_required_sections(text)
+    assert result.is_valid is True
+    assert result.missing_sections == []
+
+
+def test_validate_required_sections_reports_missing():
+    text = """
+# Problem
+# Users
+"""
+    result = validate_required_sections(text)
+    assert result.is_valid is False
+    assert result.missing_sections == ["Goals", "Features"]
 
 
 def test_matrix_json_schema_contract_has_required_fields():

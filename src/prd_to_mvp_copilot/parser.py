@@ -10,6 +10,59 @@ class Requirement:
     text: str
 
 
+@dataclass
+class PrdValidationResult:
+    required_sections: list[str]
+    missing_sections: list[str]
+    discovered_sections: list[str]
+
+    @property
+    def is_valid(self) -> bool:
+        return not self.missing_sections
+
+
+def _normalize_section_name(section: str) -> str:
+    return re.sub(r"\s+", " ", section.strip().lower())
+
+
+def extract_section_headings(prd_text: str) -> list[str]:
+    headings: list[str] = []
+    in_fenced_code_block = False
+    for raw_line in prd_text.splitlines():
+        line = raw_line.strip()
+        if line.startswith(("```", "~~~")):
+            in_fenced_code_block = not in_fenced_code_block
+            continue
+        if in_fenced_code_block or not line:
+            continue
+        if line.startswith("#"):
+            heading = line.lstrip("#").strip()
+            if heading:
+                headings.append(heading)
+    return headings
+
+
+def validate_required_sections(
+    prd_text: str,
+    required_sections: list[str] | None = None,
+) -> PrdValidationResult:
+    required = required_sections or ["Problem", "Users", "Goals", "Features"]
+    discovered = extract_section_headings(prd_text)
+    discovered_normalized = {_normalize_section_name(section) for section in discovered}
+
+    missing = [
+        section
+        for section in required
+        if _normalize_section_name(section) not in discovered_normalized
+    ]
+
+    return PrdValidationResult(
+        required_sections=required,
+        missing_sections=missing,
+        discovered_sections=discovered,
+    )
+
+
 def extract_requirements(prd_text: str) -> list[Requirement]:
     section = "General"
     reqs: list[Requirement] = []
