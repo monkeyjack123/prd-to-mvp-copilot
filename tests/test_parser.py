@@ -18,6 +18,7 @@ def test_extract_requirements_reads_bullets_and_numbered_items():
 1. Export CSV report
 2) Send report by email
 a) Include weekly digest mode
+i. Include audit event trail
 """
     reqs = extract_requirements(text)
     assert [r.text for r in reqs] == [
@@ -26,6 +27,7 @@ a) Include weekly digest mode
         "Export CSV report",
         "Send report by email",
         "Include weekly digest mode",
+        "Include audit event trail",
     ]
 
 
