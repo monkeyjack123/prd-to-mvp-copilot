@@ -42,6 +42,23 @@ def test_extract_requirements_normalizes_task_list_checkboxes():
     ]
 
 
+def test_extract_requirements_skips_fenced_code_blocks():
+    text = """
+# Scope
+- Parse this requirement
+```markdown
+- do not parse this code bullet
+1. do not parse this code item
+```
+2. Parse this numbered item
+"""
+    reqs = extract_requirements(text)
+    assert [r.text for r in reqs] == [
+        "Parse this requirement",
+        "Parse this numbered item",
+    ]
+
+
 def test_build_task_matrix_assigns_categories_milestones_and_priority():
     text = """
 # Core jobs

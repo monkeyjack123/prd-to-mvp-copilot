@@ -13,9 +13,13 @@ class Requirement:
 def extract_requirements(prd_text: str) -> list[Requirement]:
     section = "General"
     reqs: list[Requirement] = []
+    in_fenced_code_block = False
     for raw_line in prd_text.splitlines():
         line = raw_line.strip()
-        if not line:
+        if line.startswith(("```", "~~~")):
+            in_fenced_code_block = not in_fenced_code_block
+            continue
+        if in_fenced_code_block or not line:
             continue
         if line.startswith("#"):
             section = line.lstrip("#").strip() or section
