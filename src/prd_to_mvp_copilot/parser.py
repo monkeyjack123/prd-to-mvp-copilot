@@ -58,6 +58,42 @@ def infer_priority(requirement_text: str) -> str:
     return "low"
 
 
+def infer_effort(requirement_text: str) -> str:
+    lower = requirement_text.lower()
+    if any(
+        token in lower
+        for token in (
+            "migrate",
+            "multi-tenant",
+            "real-time",
+            "stream",
+            "webhook",
+            "integration",
+            "oauth",
+            "sso",
+            "encryption",
+            "permissions",
+        )
+    ):
+        return "large"
+    if any(
+        token in lower
+        for token in (
+            "dashboard",
+            "export",
+            "report",
+            "search",
+            "filter",
+            "notification",
+            "onboarding",
+            "billing",
+            "analytics",
+        )
+    ):
+        return "medium"
+    return "small"
+
+
 def build_task_matrix(requirements: list[Requirement]) -> list[dict[str, str]]:
     matrix = []
     for i, req in enumerate(requirements, start=1):
@@ -80,6 +116,7 @@ def build_task_matrix(requirements: list[Requirement]) -> list[dict[str, str]]:
                 "requirement": req.text,
                 "category": category,
                 "priority": infer_priority(req.text),
+                "effort": infer_effort(req.text),
                 "test_hint": test_hint,
             }
         )
@@ -100,6 +137,7 @@ def matrix_json_schema() -> dict[str, object]:
                 "requirement",
                 "category",
                 "priority",
+                "effort",
                 "test_hint",
             ],
             "properties": {
@@ -109,6 +147,7 @@ def matrix_json_schema() -> dict[str, object]:
                 "requirement": {"type": "string", "minLength": 1},
                 "category": {"type": "string", "enum": ["backend", "frontend", "core"]},
                 "priority": {"type": "string", "enum": ["high", "medium", "low"]},
+                "effort": {"type": "string", "enum": ["small", "medium", "large"]},
                 "test_hint": {"type": "string", "minLength": 1},
             },
             "additionalProperties": False,

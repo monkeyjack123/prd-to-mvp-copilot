@@ -6,6 +6,7 @@ from prd_to_mvp_copilot.parser import (
     map_section_to_milestone,
     matrix_json_schema,
     infer_priority,
+    infer_effort,
 )
 
 
@@ -61,6 +62,9 @@ def test_build_task_matrix_assigns_categories_milestones_and_priority():
     assert matrix[0]["priority"] == "high"
     assert matrix[1]["priority"] == "medium"
     assert matrix[2]["priority"] == "low"
+    assert matrix[0]["effort"] == "small"
+    assert matrix[1]["effort"] == "medium"
+    assert matrix[2]["effort"] == "large"
 
 
 def test_map_section_to_milestone_uses_section_and_category_fallbacks():
@@ -74,14 +78,22 @@ def test_infer_priority_with_keywords_and_default():
     assert infer_priority("Polish onboarding copy") == "low"
 
 
+def test_infer_effort_with_keywords_and_default():
+    assert infer_effort("Implement OAuth SSO integration") == "large"
+    assert infer_effort("Create analytics dashboard") == "medium"
+    assert infer_effort("Fix typo in docs") == "small"
+
+
 def test_matrix_json_schema_contract_has_required_fields():
     schema = matrix_json_schema()
     items = schema["items"]
     assert schema["type"] == "array"
     assert "milestone" in items["required"]
     assert "priority" in items["required"]
+    assert "effort" in items["required"]
     assert items["properties"]["category"]["enum"] == ["backend", "frontend", "core"]
     assert items["properties"]["priority"]["enum"] == ["high", "medium", "low"]
+    assert items["properties"]["effort"]["enum"] == ["small", "medium", "large"]
     assert items["additionalProperties"] is False
 
     json.dumps(schema)
