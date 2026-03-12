@@ -100,3 +100,25 @@ def test_cli_writes_issue_seed_json(tmp_path, capsys, monkeypatch):
     assert len(payload) == 2
     assert payload[0]["priority"] == "high"
     assert payload[0]["source_requirement_id"] == "REQ-001"
+
+
+def test_cli_writes_matrix_summary_json(tmp_path, capsys, monkeypatch):
+    prd = tmp_path / "sample.md"
+    out = tmp_path / "generated" / "matrix-summary.json"
+    prd.write_text(
+        "# Core\n- Must support auth\n# Dashboard\n- Should show dashboard KPI\n",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["prd-mvp", str(prd), "--summary-out", str(out)],
+    )
+
+    cli.main()
+    _ = capsys.readouterr()
+
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert payload["total_requirements"] == 2
+    assert payload["by_priority"] == {"high": 1, "medium": 1, "low": 0}
+    assert payload["by_category"] == {"backend": 1, "frontend": 1, "core": 0}

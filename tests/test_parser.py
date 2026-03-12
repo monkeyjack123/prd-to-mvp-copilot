@@ -9,6 +9,7 @@ from prd_to_mvp_copilot.parser import (
     infer_effort,
     extract_section_headings,
     generate_issue_seed,
+    summarize_matrix,
     validate_required_sections,
 )
 
@@ -153,6 +154,26 @@ def test_generate_issue_seed_sorts_by_priority_and_keeps_requirement_links():
     assert issues[0]["source_requirement_id"] == "REQ-002"
     assert "Acceptance Criteria" not in issues[0]  # criteria is structured list
     assert len(issues[0]["acceptance_criteria"]) == 3
+
+
+def test_summarize_matrix_returns_priority_category_and_milestone_counts():
+    text = """
+# Core
+- Must support auth middleware
+# Dashboard
+- Should show dashboard weekly trend
+# API
+- Add analytics export endpoint
+"""
+    matrix = build_task_matrix(extract_requirements(text))
+    summary = summarize_matrix(matrix)
+
+    assert summary["total_requirements"] == 3
+    assert summary["by_priority"] == {"high": 1, "medium": 1, "low": 1}
+    assert summary["by_category"] == {"backend": 1, "frontend": 1, "core": 1}
+    assert summary["by_milestone"]["M1-foundation"] == 1
+    assert summary["by_milestone"]["M2-integrations"] == 1
+    assert summary["by_milestone"]["M3-experience"] == 1
 
 
 def test_matrix_json_schema_contract_has_required_fields():

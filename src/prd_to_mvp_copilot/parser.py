@@ -216,6 +216,32 @@ def generate_issue_seed(matrix: list[dict[str, str]]) -> list[dict[str, object]]
     return issues
 
 
+def summarize_matrix(matrix: list[dict[str, str]]) -> dict[str, object]:
+    summary: dict[str, object] = {
+        "total_requirements": len(matrix),
+        "by_priority": {"high": 0, "medium": 0, "low": 0},
+        "by_category": {"backend": 0, "frontend": 0, "core": 0},
+        "by_milestone": {},
+    }
+
+    by_priority = summary["by_priority"]
+    by_category = summary["by_category"]
+    by_milestone = summary["by_milestone"]
+
+    for row in matrix:
+        priority = row["priority"]
+        category = row["category"]
+        milestone = row["milestone"]
+
+        if priority in by_priority:
+            by_priority[priority] += 1
+        if category in by_category:
+            by_category[category] += 1
+        by_milestone[milestone] = by_milestone.get(milestone, 0) + 1
+
+    return summary
+
+
 def matrix_json_schema() -> dict[str, object]:
     return {
         "$schema": "https://json-schema.org/draft/2020-12/schema",

@@ -10,6 +10,7 @@ from .parser import (
     build_task_matrix,
     generate_issue_seed,
     matrix_json_schema,
+    summarize_matrix,
     validate_required_sections,
 )
 
@@ -32,6 +33,11 @@ def main() -> None:
         "--issues-json-out",
         type=Path,
         help="Optional path to write generated issue seed JSON",
+    )
+    parser.add_argument(
+        "--summary-out",
+        type=Path,
+        help="Optional path to write matrix summary JSON (counts by priority/category/milestone)",
     )
     parser.add_argument(
         "--validate",
@@ -85,6 +91,10 @@ def main() -> None:
     if args.issues_json_out:
         args.issues_json_out.parent.mkdir(parents=True, exist_ok=True)
         args.issues_json_out.write_text(json.dumps(issues, indent=2) + "\n", encoding="utf-8")
+
+    if args.summary_out:
+        args.summary_out.parent.mkdir(parents=True, exist_ok=True)
+        args.summary_out.write_text(json.dumps(summarize_matrix(matrix), indent=2) + "\n", encoding="utf-8")
 
     if args.validate:
         if validation.missing_sections:
