@@ -255,3 +255,57 @@ def test_cli_dedupe_collapses_duplicate_requirements_within_same_section(tmp_pat
     assert len(payload) == 2
     assert payload[0]["section"] == "Scope"
     assert payload[1]["section"] == "Dashboard"
+
+
+def test_cli_min_priority_filters_matrix_output(tmp_path, capsys, monkeypatch):
+    prd = tmp_path / "sample.md"
+    prd.write_text(
+        "# Scope\n- Must support auth\n- Should show dashboard KPI\n- Nice-to-have copy polish\n",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["prd-mvp", str(prd), "--min-priority", "medium"],
+    )
+
+    cli.main()
+    captured = capsys.readouterr()
+
+    payload = json.loads(captured.out)
+    assert [row["priority"] for row in payload] == ["high", "medium"]
+
+
+def test_cli_min_priority_filters_issue_seed_and_summary_outputs(tmp_path, capsys, monkeypatch):
+    prd = tmp_path / "sample.md"
+    issues_out = tmp_path / "generated" / "issue-seed.json"
+    summary_out = tmp_path / "generated" / "summary.json"
+    prd.write_text(
+        "# Scope\n- Must support auth\n- Should show dashboard KPI\n- Nice-to-have copy polish\n",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "prd-mvp",
+            str(prd),
+            "--min-priority",
+            "high",
+            "--issues-json-out",
+            str(issues_out),
+            "--summary-out",
+            str(summary_out),
+        ],
+    )
+
+    cli.main()
+    _ = capsys.readouterr()
+
+    issues_payload = json.loads(issues_out.read_text(encoding="utf-8"))
+    summary_payload = json.loads(summary_out.read_text(encoding="utf-8"))
+
+    assert len(issues_payload) == 1
+    assert issues_payload[0]["priority"] == "high"
+    assert summary_payload["total_requirements"] == 1
+    assert summary_payload["by_priority"] == {"high": 1, "medium": 0, "low": 0}

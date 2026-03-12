@@ -77,6 +77,14 @@ def main() -> None:
         help="Deduplicate repeated requirements within the same section before matrix generation",
     )
     parser.add_argument(
+        "--min-priority",
+        choices=["low", "medium", "high"],
+        help=(
+            "Filter matrix/issue/summary outputs to requirements at or above this priority "
+            "(high only, medium+high, or all)."
+        ),
+    )
+    parser.add_argument(
         "--require-section",
         action="append",
         default=[],
@@ -95,6 +103,15 @@ def main() -> None:
     if args.dedupe:
         requirements = dedupe_requirements(requirements)
     matrix = build_task_matrix(requirements)
+
+    if args.min_priority:
+        priority_rank = {"low": 0, "medium": 1, "high": 2}
+        min_rank = priority_rank[args.min_priority]
+        matrix = [
+            row
+            for row in matrix
+            if priority_rank.get(row["priority"], -1) >= min_rank
+        ]
 
     if args.fail_on_empty and not matrix:
         print(

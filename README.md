@@ -13,6 +13,7 @@ Turn product requirements into runnable MVP scaffolds.
 - Optional PRD section validation (`--validate`) with default Problem/Users/Goals/Features, overridable via repeated `--require-section`
 - Optional strict extraction guard (`--fail-on-empty`) to fail fast when no actionable requirements were parsed
 - Optional duplicate requirement collapse (`--dedupe`) to remove repeated bullets within the same section before matrix/issue generation
+- Optional minimum-priority filtering (`--min-priority low|medium|high`) to focus matrix/issue/summary outputs on higher-impact requirements
 - Optional JSON Schema export for downstream validators/contracts
 - Optional issue-seed markdown generation (`--issues-out`) for fast GitHub backlog drafting
 - Optional issue-seed JSON export (`--issues-json-out`) for automation pipelines and API ingestion
@@ -44,6 +45,8 @@ prd-mvp demo/sample_prd.md --validation-out generated/validation.json
 prd-mvp demo/sample_prd.md --fail-on-empty
 # collapse duplicate requirements in the same section before generating output
 prd-mvp demo/sample_prd.md --dedupe
+# emit only medium/high requirements for focused planning artifacts
+prd-mvp demo/sample_prd.md --min-priority medium
 ```
 
 ## Example output
