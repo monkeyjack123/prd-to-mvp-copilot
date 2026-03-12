@@ -25,20 +25,53 @@ def _normalize_section_name(section: str) -> str:
     return re.sub(r"\s+", " ", section.strip().lower())
 
 
+def _is_setext_underline(line: str) -> bool:
+    return bool(re.match(r"^(=+|-+)$", line.strip()))
+
+
+def _is_candidate_setext_heading(line: str) -> bool:
+    stripped = line.strip()
+    if not stripped:
+        return False
+    if stripped.startswith("#"):
+        return False
+    if stripped.startswith(("- ", "* ", "+ ")):
+        return False
+    if re.match(r"^(\d+[\.)]|[a-zA-Z][\.)]|[ivxlcdmIVXLCDM]+[\.)])\s+", stripped):
+        return False
+    return True
+
+
 def extract_section_headings(prd_text: str) -> list[str]:
     headings: list[str] = []
     in_fenced_code_block = False
+    previous_line = ""
+
     for raw_line in prd_text.splitlines():
         line = raw_line.strip()
         if line.startswith(("```", "~~~")):
             in_fenced_code_block = not in_fenced_code_block
+            previous_line = ""
             continue
-        if in_fenced_code_block or not line:
+
+        if in_fenced_code_block:
             continue
+
         if line.startswith("#"):
             heading = line.lstrip("#").strip()
             if heading:
                 headings.append(heading)
+            previous_line = line
+            continue
+
+        if _is_setext_underline(line) and _is_candidate_setext_heading(previous_line):
+            headings.append(previous_line.strip())
+            previous_line = ""
+            continue
+
+        if line:
+            previous_line = line
+
     return headings
 
 
@@ -67,26 +100,41 @@ def extract_requirements(prd_text: str) -> list[Requirement]:
     section = "General"
     reqs: list[Requirement] = []
     in_fenced_code_block = False
+    previous_line = ""
+
     for raw_line in prd_text.splitlines():
         line = raw_line.strip()
         if line.startswith(("```", "~~~")):
             in_fenced_code_block = not in_fenced_code_block
+            previous_line = ""
             continue
-        if in_fenced_code_block or not line:
+        if in_fenced_code_block:
+            continue
+        if not line:
+            previous_line = ""
             continue
         if line.startswith("#"):
             section = line.lstrip("#").strip() or section
+            previous_line = line
+            continue
+        if _is_setext_underline(line) and _is_candidate_setext_heading(previous_line):
+            section = previous_line.strip() or section
+            previous_line = ""
             continue
         if line.startswith(("- ", "* ", "+ ")):
             text = line[2:].strip()
             text = re.sub(r"^\[[ xX]\]\s*", "", text)
             if text:
                 reqs.append(Requirement(section=section, text=text))
+            previous_line = line
             continue
 
         if re.match(r"^(\d+[\.)]|[a-zA-Z][\.)]|[ivxlcdmIVXLCDM]+[\.)])\s+", line):
             text = re.sub(r"^(\d+[\.)]|[a-zA-Z][\.)]|[ivxlcdmIVXLCDM]+[\.)])\s+", "", line)
             reqs.append(Requirement(section=section, text=text))
+
+        previous_line = line
+
     return reqs
 
 

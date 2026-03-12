@@ -121,6 +121,36 @@ def test_extract_section_headings_skips_code_block_headings():
     assert extract_section_headings(text) == ["Problem", "Users", "Features"]
 
 
+def test_extract_section_headings_supports_setext_style_headings():
+    text = """
+Problem Statement
+=================
+
+Users
+-----
+
+- Must support SSO
+"""
+    assert extract_section_headings(text) == ["Problem Statement", "Users"]
+
+
+def test_extract_requirements_uses_setext_headings_for_section_context():
+    text = """
+Scope
+=====
+- Must support auth middleware
+
+Dashboard
+---------
+- Should show weekly KPIs
+"""
+    reqs = extract_requirements(text)
+    assert [(r.section, r.text) for r in reqs] == [
+        ("Scope", "Must support auth middleware"),
+        ("Dashboard", "Should show weekly KPIs"),
+    ]
+
+
 def test_validate_required_sections_is_case_insensitive():
     text = """
 # problem
