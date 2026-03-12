@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import sys
 from pathlib import Path
@@ -37,6 +38,11 @@ def main() -> None:
         "--schema-out",
         type=Path,
         help="Optional path to write task matrix JSON Schema",
+    )
+    parser.add_argument(
+        "--csv-out",
+        type=Path,
+        help="Optional path to write task matrix as CSV",
     )
     parser.add_argument(
         "--issues-out",
@@ -119,6 +125,25 @@ def main() -> None:
             file=sys.stderr,
         )
         sys.exit(2)
+
+    if args.csv_out:
+        args.csv_out.parent.mkdir(parents=True, exist_ok=True)
+        with args.csv_out.open("w", encoding="utf-8", newline="") as csv_file:
+            writer = csv.DictWriter(
+                csv_file,
+                fieldnames=[
+                    "id",
+                    "section",
+                    "milestone",
+                    "category",
+                    "priority",
+                    "effort",
+                    "requirement",
+                    "test_hint",
+                ],
+            )
+            writer.writeheader()
+            writer.writerows(matrix)
 
     if args.schema_out:
         args.schema_out.write_text(json.dumps(matrix_json_schema(), indent=2) + "\n", encoding="utf-8")

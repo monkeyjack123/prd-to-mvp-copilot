@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import json
 
 import pytest
@@ -217,6 +218,27 @@ def test_cli_writes_matrix_output_markdown_file(tmp_path, capsys, monkeypatch):
     assert content.startswith("| id | section | milestone")
     assert "REQ-001" in content
     assert captured.out.startswith("| id | section | milestone")
+
+
+def test_cli_writes_matrix_csv_file(tmp_path, capsys, monkeypatch):
+    prd = tmp_path / "sample.md"
+    out = tmp_path / "generated" / "matrix.csv"
+    prd.write_text("# Scope\n- Must support auth\n", encoding="utf-8")
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["prd-mvp", str(prd), "--csv-out", str(out)],
+    )
+
+    cli.main()
+    _ = capsys.readouterr()
+
+    with out.open("r", encoding="utf-8", newline="") as csv_file:
+        rows = list(csv.DictReader(csv_file))
+
+    assert len(rows) == 1
+    assert rows[0]["id"] == "REQ-001"
+    assert rows[0]["priority"] == "high"
 
 
 def test_cli_markdown_output_escapes_pipe_and_newline_characters(tmp_path, capsys, monkeypatch):
