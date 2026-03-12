@@ -236,9 +236,21 @@ def build_task_matrix(requirements: list[Requirement]) -> list[dict[str, str]]:
     matrix = []
     for i, req in enumerate(requirements, start=1):
         lower = req.text.lower()
-        if "auth" in lower or "login" in lower:
+        backend_tokens = (
+            "auth",
+            "login",
+            "api",
+            "backend",
+            "webhook",
+            "endpoint",
+            "integration",
+            "database",
+            "storage",
+        )
+
+        if any(token in lower for token in backend_tokens):
             category = "backend"
-            test_hint = "auth flow passes"
+            test_hint = "auth/integration flow passes"
         elif "ui" in lower or "dashboard" in lower:
             category = "frontend"
             test_hint = "render and interaction snapshot"

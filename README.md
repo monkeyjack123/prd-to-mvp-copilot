@@ -7,6 +7,7 @@ Turn product requirements into runnable MVP scaffolds.
 - Section detection supports both ATX headings (`# Heading`, including closing-hash style like `## Heading ##`) and Setext headings (`Heading` + `===`/`---`)
 - Ignores list-like text inside fenced code blocks (``` / ~~~) so examples/snippets do not pollute extracted requirements
 - Task-matrix generator with category + milestone mapping + effort sizing + test hints
+- Backend category inference now recognizes integration-heavy requirements (`api`, `webhook`, `endpoint`, `database`, etc.) for more accurate execution planning
 - Priority inference (`high`/`medium`/`low`) from requirement language (`must`, `critical`, `should`, etc.)
 - CLI (`prd-mvp`) outputting JSON or Markdown table (Markdown cells are escaped for safe rendering when requirements include `|` or line breaks)
 - Optional matrix file export (`--matrix-out`) in either JSON or Markdown format for CI artifacts
@@ -57,7 +58,7 @@ prd-mvp demo/sample_prd.md --min-priority medium
 ```text
 | id | section | milestone | category | priority | effort | requirement | test_hint |
 |---|---|---|---|---|---|---|---|
-| REQ-001 | Core jobs | M1-foundation | backend | high | small | Must support login and reset password | auth flow passes |
+| REQ-001 | Core jobs | M1-foundation | backend | high | small | Must support login and reset password | auth/integration flow passes |
 | REQ-002 | Core jobs | M1-foundation | frontend | medium | medium | Should show dashboard weekly activation trend | render and interaction snapshot |
 | REQ-003 | Core jobs | M1-foundation | core | low | medium | Export account activity CSV | acceptance criteria validated |
 ```

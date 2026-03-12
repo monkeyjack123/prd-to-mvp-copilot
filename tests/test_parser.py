@@ -80,10 +80,10 @@ def test_build_task_matrix_assigns_categories_milestones_and_priority():
     matrix = build_task_matrix(extract_requirements(text))
     assert matrix[0]["category"] == "backend"
     assert matrix[1]["category"] == "frontend"
-    assert matrix[2]["category"] == "core"
+    assert matrix[2]["category"] == "backend"
     assert matrix[0]["milestone"] == "M1-foundation"
     assert matrix[1]["milestone"] == "M3-experience"
-    assert matrix[2]["milestone"] == "M1-foundation"
+    assert matrix[2]["milestone"] == "M2-integrations"
     assert matrix[0]["id"] == "REQ-001"
     assert matrix[0]["priority"] == "high"
     assert matrix[1]["priority"] == "medium"
@@ -203,7 +203,7 @@ def test_summarize_matrix_returns_priority_category_and_milestone_counts():
 
     assert summary["total_requirements"] == 3
     assert summary["by_priority"] == {"high": 1, "medium": 1, "low": 1}
-    assert summary["by_category"] == {"backend": 1, "frontend": 1, "core": 1}
+    assert summary["by_category"] == {"backend": 2, "frontend": 1, "core": 0}
     assert summary["by_milestone"]["M1-foundation"] == 1
     assert summary["by_milestone"]["M2-integrations"] == 1
     assert summary["by_milestone"]["M3-experience"] == 1
