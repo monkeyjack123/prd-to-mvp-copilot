@@ -25,6 +25,16 @@ def _normalize_section_name(section: str) -> str:
     return re.sub(r"\s+", " ", section.strip().lower())
 
 
+
+
+def _extract_atx_heading_text(line: str) -> str | None:
+    stripped = line.strip()
+    match = re.match(r"^(#{1,6})\s+(.*?)\s*#*\s*$", stripped)
+    if not match:
+        return None
+    heading = match.group(2).strip()
+    return heading or None
+
 def _is_setext_underline(line: str) -> bool:
     return bool(re.match(r"^(=+|-+)$", line.strip()))
 
@@ -57,10 +67,9 @@ def extract_section_headings(prd_text: str) -> list[str]:
         if in_fenced_code_block:
             continue
 
-        if line.startswith("#"):
-            heading = line.lstrip("#").strip()
-            if heading:
-                headings.append(heading)
+        heading = _extract_atx_heading_text(line)
+        if heading:
+            headings.append(heading)
             previous_line = line
             continue
 
@@ -113,8 +122,9 @@ def extract_requirements(prd_text: str) -> list[Requirement]:
         if not line:
             previous_line = ""
             continue
-        if line.startswith("#"):
-            section = line.lstrip("#").strip() or section
+        heading = _extract_atx_heading_text(line)
+        if heading:
+            section = heading
             previous_line = line
             continue
         if _is_setext_underline(line) and _is_candidate_setext_heading(previous_line):

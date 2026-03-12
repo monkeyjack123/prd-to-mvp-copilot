@@ -221,3 +221,22 @@ def test_matrix_json_schema_contract_has_required_fields():
     assert items["additionalProperties"] is False
 
     json.dumps(schema)
+
+def test_extract_section_headings_trims_closing_atx_hashes():
+    text = """
+# Problem #
+## Users ####
+### Features
+"""
+    assert extract_section_headings(text) == ["Problem", "Users", "Features"]
+
+
+def test_extract_requirements_uses_trimmed_atx_section_name_context():
+    text = """
+## Dashboard ####
+- Should show weekly KPIs
+"""
+    reqs = extract_requirements(text)
+    assert [(r.section, r.text) for r in reqs] == [
+        ("Dashboard", "Should show weekly KPIs"),
+    ]
