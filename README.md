@@ -15,6 +15,7 @@ Turn product requirements into runnable MVP scaffolds.
 - Optional issue-seed markdown generation (`--issues-out`) for fast GitHub backlog drafting
 - Optional issue-seed JSON export (`--issues-json-out`) for automation pipelines and API ingestion
 - Optional matrix summary JSON export (`--summary-out`) with counts by priority/category/milestone for sprint planning
+- Optional validation report JSON export (`--validation-out`) containing required/missing/discovered section data for CI gates
 - Demo PRD and pytest coverage
 
 ## Quickstart
@@ -33,6 +34,8 @@ prd-mvp demo/sample_prd.md --issues-out generated/issue-seed.md
 prd-mvp demo/sample_prd.md --issues-json-out generated/issue-seed.json
 # export matrix summary for sprint planning and reporting
 prd-mvp demo/sample_prd.md --summary-out generated/matrix-summary.json
+# export machine-readable validation details for CI checks
+prd-mvp demo/sample_prd.md --validation-out generated/validation.json
 # fail CI quickly when a PRD has no parsed bullet/numbered requirements
 prd-mvp demo/sample_prd.md --fail-on-empty
 ```

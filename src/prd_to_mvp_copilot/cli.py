@@ -40,6 +40,14 @@ def main() -> None:
         help="Optional path to write matrix summary JSON (counts by priority/category/milestone)",
     )
     parser.add_argument(
+        "--validation-out",
+        type=Path,
+        help=(
+            "Optional path to write PRD section validation JSON "
+            "(required/missing/discovered/is_valid)"
+        ),
+    )
+    parser.add_argument(
         "--validate",
         action="store_true",
         help="Validate required PRD sections (Problem, Users, Goals, Features)",
@@ -107,6 +115,22 @@ def main() -> None:
     if args.summary_out:
         args.summary_out.parent.mkdir(parents=True, exist_ok=True)
         args.summary_out.write_text(json.dumps(summarize_matrix(matrix), indent=2) + "\n", encoding="utf-8")
+
+    if args.validation_out:
+        args.validation_out.parent.mkdir(parents=True, exist_ok=True)
+        args.validation_out.write_text(
+            json.dumps(
+                {
+                    "required_sections": validation.required_sections,
+                    "missing_sections": validation.missing_sections,
+                    "discovered_sections": validation.discovered_sections,
+                    "is_valid": validation.is_valid,
+                },
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
 
     if args.validate:
         if validation.missing_sections:

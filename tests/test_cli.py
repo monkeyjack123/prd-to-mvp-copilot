@@ -139,3 +139,44 @@ def test_cli_writes_matrix_summary_json(tmp_path, capsys, monkeypatch):
     assert payload["total_requirements"] == 2
     assert payload["by_priority"] == {"high": 1, "medium": 1, "low": 0}
     assert payload["by_category"] == {"backend": 1, "frontend": 1, "core": 0}
+
+
+def test_cli_writes_validation_json_pass_case(tmp_path, capsys, monkeypatch):
+    prd = tmp_path / "sample.md"
+    out = tmp_path / "generated" / "validation.json"
+    prd.write_text(
+        "# Problem\n# Users\n# Goals\n# Features\n- Must support auth\n",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["prd-mvp", str(prd), "--validation-out", str(out)],
+    )
+
+    cli.main()
+    _ = capsys.readouterr()
+
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert payload["is_valid"] is True
+    assert payload["missing_sections"] == []
+    assert payload["required_sections"] == ["Problem", "Users", "Goals", "Features"]
+
+
+def test_cli_writes_validation_json_missing_sections(tmp_path, capsys, monkeypatch):
+    prd = tmp_path / "sample.md"
+    out = tmp_path / "generated" / "validation.json"
+    prd.write_text("# Problem\n- Must support auth\n", encoding="utf-8")
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["prd-mvp", str(prd), "--validation-out", str(out)],
+    )
+
+    cli.main()
+    _ = capsys.readouterr()
+
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert payload["is_valid"] is False
+    assert payload["missing_sections"] == ["Users", "Goals", "Features"]
+    assert payload["discovered_sections"] == ["Problem"]
