@@ -77,7 +77,7 @@ def extract_requirements(prd_text: str) -> list[Requirement]:
         if line.startswith("#"):
             section = line.lstrip("#").strip() or section
             continue
-        if line.startswith(("- ", "* ")):
+        if line.startswith(("- ", "* ", "+ ")):
             text = line[2:].strip()
             text = re.sub(r"^\[[ xX]\]\s*", "", text)
             if text:

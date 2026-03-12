@@ -18,7 +18,8 @@ def test_extract_requirements_reads_bullets_and_numbered_items():
     text = """
 # Scope
 - User can login with email
-- Dashboard shows KPI cards
+* Dashboard shows KPI cards
++ Include SSO login option
 1. Export CSV report
 2) Send report by email
 a) Include weekly digest mode
@@ -28,6 +29,7 @@ i. Include audit event trail
     assert [r.text for r in reqs] == [
         "User can login with email",
         "Dashboard shows KPI cards",
+        "Include SSO login option",
         "Export CSV report",
         "Send report by email",
         "Include weekly digest mode",
