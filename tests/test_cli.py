@@ -180,3 +180,40 @@ def test_cli_writes_validation_json_missing_sections(tmp_path, capsys, monkeypat
     assert payload["is_valid"] is False
     assert payload["missing_sections"] == ["Users", "Goals", "Features"]
     assert payload["discovered_sections"] == ["Problem"]
+
+
+def test_cli_writes_matrix_output_json_file(tmp_path, capsys, monkeypatch):
+    prd = tmp_path / "sample.md"
+    out = tmp_path / "generated" / "matrix.json"
+    prd.write_text("# Scope\n- Must support auth\n", encoding="utf-8")
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["prd-mvp", str(prd), "--matrix-out", str(out)],
+    )
+
+    cli.main()
+    captured = capsys.readouterr()
+
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert payload[0]["id"] == "REQ-001"
+    assert captured.out.strip().startswith("[")
+
+
+def test_cli_writes_matrix_output_markdown_file(tmp_path, capsys, monkeypatch):
+    prd = tmp_path / "sample.md"
+    out = tmp_path / "generated" / "matrix.md"
+    prd.write_text("# Scope\n- Should show dashboard KPI\n", encoding="utf-8")
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["prd-mvp", str(prd), "--format", "md", "--matrix-out", str(out)],
+    )
+
+    cli.main()
+    captured = capsys.readouterr()
+
+    content = out.read_text(encoding="utf-8")
+    assert content.startswith("| id | section | milestone")
+    assert "REQ-001" in content
+    assert captured.out.startswith("| id | section | milestone")

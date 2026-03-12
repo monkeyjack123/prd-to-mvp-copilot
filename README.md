@@ -9,6 +9,7 @@ Turn product requirements into runnable MVP scaffolds.
 - Task-matrix generator with category + milestone mapping + effort sizing + test hints
 - Priority inference (`high`/`medium`/`low`) from requirement language (`must`, `critical`, `should`, etc.)
 - CLI (`prd-mvp`) outputting JSON or Markdown table
+- Optional matrix file export (`--matrix-out`) in either JSON or Markdown format for CI artifacts
 - Optional PRD section validation (`--validate`) with default Problem/Users/Goals/Features, overridable via repeated `--require-section`
 - Optional strict extraction guard (`--fail-on-empty`) to fail fast when no actionable requirements were parsed
 - Optional JSON Schema export for downstream validators/contracts
@@ -28,6 +29,8 @@ pytest
 prd-mvp demo/sample_prd.md --format md --schema-out demo/task_matrix.schema.json --validate
 # custom validation contract (repeat --require-section)
 prd-mvp demo/sample_prd.md --validate --require-section Problem --require-section Features
+# write matrix output to an artifact file while still printing stdout
+prd-mvp demo/sample_prd.md --format md --matrix-out generated/task-matrix.md
 # generate issue-seed markdown for backlog import
 prd-mvp demo/sample_prd.md --issues-out generated/issue-seed.md
 # generate issue-seed JSON for automation

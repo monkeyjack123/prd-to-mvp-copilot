@@ -20,6 +20,11 @@ def main() -> None:
     parser.add_argument("input", type=Path, help="Path to PRD markdown")
     parser.add_argument("--format", choices=["json", "md"], default="json")
     parser.add_argument(
+        "--matrix-out",
+        type=Path,
+        help="Optional path to write task matrix output in selected --format",
+    )
+    parser.add_argument(
         "--schema-out",
         type=Path,
         help="Optional path to write task matrix JSON Schema",
@@ -150,14 +155,23 @@ def main() -> None:
         )
 
     if args.format == "json":
-        print(json.dumps(matrix, indent=2))
+        rendered_output = json.dumps(matrix, indent=2)
     else:
-        print("| id | section | milestone | category | priority | effort | requirement | test_hint |")
-        print("|---|---|---|---|---|---|---|---|")
+        lines = [
+            "| id | section | milestone | category | priority | effort | requirement | test_hint |",
+            "|---|---|---|---|---|---|---|---|",
+        ]
         for row in matrix:
-            print(
+            lines.append(
                 f"| {row['id']} | {row['section']} | {row['milestone']} | {row['category']} | {row['priority']} | {row['effort']} | {row['requirement']} | {row['test_hint']} |"
             )
+        rendered_output = "\n".join(lines)
+
+    if args.matrix_out:
+        args.matrix_out.parent.mkdir(parents=True, exist_ok=True)
+        args.matrix_out.write_text(rendered_output + "\n", encoding="utf-8")
+
+    print(rendered_output)
 
 
 if __name__ == "__main__":
