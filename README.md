@@ -10,6 +10,7 @@ Turn product requirements into runnable MVP scaffolds.
 - Priority inference (`high`/`medium`/`low`) from requirement language (`must`, `critical`, `should`, etc.)
 - CLI (`prd-mvp`) outputting JSON or Markdown table
 - Optional PRD section validation (`--validate`) with default Problem/Users/Goals/Features, overridable via repeated `--require-section`
+- Optional strict extraction guard (`--fail-on-empty`) to fail fast when no actionable requirements were parsed
 - Optional JSON Schema export for downstream validators/contracts
 - Optional issue-seed markdown generation (`--issues-out`) for fast GitHub backlog drafting
 - Optional issue-seed JSON export (`--issues-json-out`) for automation pipelines and API ingestion
@@ -32,6 +33,8 @@ prd-mvp demo/sample_prd.md --issues-out generated/issue-seed.md
 prd-mvp demo/sample_prd.md --issues-json-out generated/issue-seed.json
 # export matrix summary for sprint planning and reporting
 prd-mvp demo/sample_prd.md --summary-out generated/matrix-summary.json
+# fail CI quickly when a PRD has no parsed bullet/numbered requirements
+prd-mvp demo/sample_prd.md --fail-on-empty
 ```
 
 ## Example output

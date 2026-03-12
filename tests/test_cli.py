@@ -57,6 +57,23 @@ def test_cli_validate_with_custom_required_sections_fails(tmp_path, capsys, monk
     assert "Discovered sections: Problem" in captured.err
 
 
+def test_cli_fail_on_empty_exits_with_code_2(tmp_path, capsys, monkeypatch):
+    prd = tmp_path / "sample.md"
+    prd.write_text("# Problem\n\nNo bullet requirements here.\n", encoding="utf-8")
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["prd-mvp", str(prd), "--fail-on-empty"],
+    )
+
+    with pytest.raises(SystemExit) as exc:
+        cli.main()
+
+    assert exc.value.code == 2
+    captured = capsys.readouterr()
+    assert "No requirements extracted from PRD" in captured.err
+
+
 def test_cli_writes_issue_seed_markdown(tmp_path, capsys, monkeypatch):
     prd = tmp_path / "sample.md"
     out = tmp_path / "generated" / "issue-seed.md"

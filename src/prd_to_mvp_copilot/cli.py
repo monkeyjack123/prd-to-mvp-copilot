@@ -45,6 +45,11 @@ def main() -> None:
         help="Validate required PRD sections (Problem, Users, Goals, Features)",
     )
     parser.add_argument(
+        "--fail-on-empty",
+        action="store_true",
+        help="Exit with code 2 when no requirements are extracted from the PRD",
+    )
+    parser.add_argument(
         "--require-section",
         action="append",
         default=[],
@@ -60,6 +65,13 @@ def main() -> None:
     required_sections = args.require_section or None
     validation = validate_required_sections(prd_text, required_sections=required_sections)
     matrix = build_task_matrix(extract_requirements(prd_text))
+
+    if args.fail_on_empty and not matrix:
+        print(
+            "No requirements extracted from PRD. Add bullet/numbered requirements or remove --fail-on-empty.",
+            file=sys.stderr,
+        )
+        sys.exit(2)
 
     if args.schema_out:
         args.schema_out.write_text(json.dumps(matrix_json_schema(), indent=2) + "\n", encoding="utf-8")
