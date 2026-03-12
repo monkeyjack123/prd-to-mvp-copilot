@@ -234,3 +234,24 @@ def test_cli_markdown_output_escapes_pipe_and_newline_characters(tmp_path, capsy
 
     content = out.read_text(encoding="utf-8")
     assert "Must support OAuth \\| SSO" in content
+
+
+def test_cli_dedupe_collapses_duplicate_requirements_within_same_section(tmp_path, capsys, monkeypatch):
+    prd = tmp_path / "sample.md"
+    prd.write_text(
+        "# Scope\n- Must support auth\n- must support auth\n# Dashboard\n- Must support auth\n",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["prd-mvp", str(prd), "--dedupe"],
+    )
+
+    cli.main()
+    captured = capsys.readouterr()
+
+    payload = json.loads(captured.out)
+    assert len(payload) == 2
+    assert payload[0]["section"] == "Scope"
+    assert payload[1]["section"] == "Dashboard"

@@ -7,6 +7,7 @@ from pathlib import Path
 
 from .parser import (
     extract_requirements,
+    dedupe_requirements,
     build_task_matrix,
     generate_issue_seed,
     matrix_json_schema,
@@ -71,6 +72,11 @@ def main() -> None:
         help="Exit with code 2 when no requirements are extracted from the PRD",
     )
     parser.add_argument(
+        "--dedupe",
+        action="store_true",
+        help="Deduplicate repeated requirements within the same section before matrix generation",
+    )
+    parser.add_argument(
         "--require-section",
         action="append",
         default=[],
@@ -85,7 +91,10 @@ def main() -> None:
     prd_text = args.input.read_text(encoding="utf-8")
     required_sections = args.require_section or None
     validation = validate_required_sections(prd_text, required_sections=required_sections)
-    matrix = build_task_matrix(extract_requirements(prd_text))
+    requirements = extract_requirements(prd_text)
+    if args.dedupe:
+        requirements = dedupe_requirements(requirements)
+    matrix = build_task_matrix(requirements)
 
     if args.fail_on_empty and not matrix:
         print(

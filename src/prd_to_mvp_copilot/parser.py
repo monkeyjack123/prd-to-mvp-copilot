@@ -148,6 +148,29 @@ def extract_requirements(prd_text: str) -> list[Requirement]:
     return reqs
 
 
+
+
+def dedupe_requirements(requirements: list[Requirement]) -> list[Requirement]:
+    """Remove duplicate requirements while preserving first-seen order.
+
+    Deduplication is based on normalized (section, requirement text) pairs so
+    repeated bullets in the same section do not produce duplicate matrix rows.
+    """
+    deduped: list[Requirement] = []
+    seen: set[tuple[str, str]] = set()
+
+    for requirement in requirements:
+        key = (
+            _normalize_section_name(requirement.section),
+            re.sub(r"\s+", " ", requirement.text.strip().lower()),
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(requirement)
+
+    return deduped
+
 def map_section_to_milestone(section: str, category: str) -> str:
     lower = section.lower()
     if any(token in lower for token in ("auth", "core", "foundation", "account")):

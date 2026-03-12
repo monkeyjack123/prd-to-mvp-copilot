@@ -11,6 +11,7 @@ from prd_to_mvp_copilot.parser import (
     generate_issue_seed,
     summarize_matrix,
     validate_required_sections,
+    dedupe_requirements,
 )
 
 
@@ -239,4 +240,21 @@ def test_extract_requirements_uses_trimmed_atx_section_name_context():
     reqs = extract_requirements(text)
     assert [(r.section, r.text) for r in reqs] == [
         ("Dashboard", "Should show weekly KPIs"),
+    ]
+
+
+def test_dedupe_requirements_drops_section_local_duplicates_case_insensitively():
+    text = """
+# Scope
+- Must support auth
+- must support   auth
+# Dashboard
+- Must support auth
+"""
+    reqs = extract_requirements(text)
+    deduped = dedupe_requirements(reqs)
+
+    assert [(r.section, r.text) for r in deduped] == [
+        ("Scope", "Must support auth"),
+        ("Dashboard", "Must support auth"),
     ]
