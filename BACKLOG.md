@@ -150,3 +150,19 @@
 - PRD diff mode (`generate --update`) for iterative regeneration.
 - Optional Docker Compose setup for one-command run.
 - Template theming (SaaS, marketplace, internal tool presets).
+
+---
+
+## Progress
+
+**2026-03-10 (Cycle: product-matrix-autopilot-6h)**
+- Shipped issue-seed generation pipeline via new `--issues-out` CLI flag.
+- Added deterministic issue draft builder (`generate_issue_seed`) sorted by priority/milestone and linked back to source requirement IDs.
+- Added parser + CLI tests for issue-seed generation (`tests/test_parser.py`, `tests/test_cli.py`).
+- Updated README feature list and quickstart with issue-seed usage example (`generated/issue-seed.md`).
+
+**2026-03-08 (Cycle: product-matrix-autopilot-6h)**
+- Added CLI support for custom validation contracts via repeated `--require-section`.
+- Improved validation failure output with discovered headings to make fixes actionable.
+- Added CLI unit tests for custom section validation pass/fail behavior (`tests/test_cli.py`).
+- Updated README quickstart/feature list with custom-required-section usage.

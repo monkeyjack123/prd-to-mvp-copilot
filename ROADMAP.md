@@ -8,6 +8,7 @@
 ## v0.2
 - Integrations and templates
 - Better UX and configuration
+- Seed backlog generation from matrix output (`--issues-out`)
 
 ## v0.3
 - Team collaboration

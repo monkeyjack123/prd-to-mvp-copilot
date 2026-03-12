@@ -8,6 +8,7 @@ from prd_to_mvp_copilot.parser import (
     infer_priority,
     infer_effort,
     extract_section_headings,
+    generate_issue_seed,
     validate_required_sections,
 )
 
@@ -137,6 +138,21 @@ def test_validate_required_sections_reports_missing():
     result = validate_required_sections(text)
     assert result.is_valid is False
     assert result.missing_sections == ["Goals", "Features"]
+
+
+def test_generate_issue_seed_sorts_by_priority_and_keeps_requirement_links():
+    text = """
+# Core
+- Should add weekly dashboard
+- Must support auth middleware
+"""
+    matrix = build_task_matrix(extract_requirements(text))
+    issues = generate_issue_seed(matrix)
+
+    assert issues[0]["priority"] == "high"
+    assert issues[0]["source_requirement_id"] == "REQ-002"
+    assert "Acceptance Criteria" not in issues[0]  # criteria is structured list
+    assert len(issues[0]["acceptance_criteria"]) == 3
 
 
 def test_matrix_json_schema_contract_has_required_fields():

@@ -180,6 +180,42 @@ def build_task_matrix(requirements: list[Requirement]) -> list[dict[str, str]]:
     return matrix
 
 
+def generate_issue_seed(matrix: list[dict[str, str]]) -> list[dict[str, object]]:
+    priority_rank = {"high": 0, "medium": 1, "low": 2}
+    issues: list[dict[str, object]] = []
+
+    sorted_matrix = sorted(
+        matrix,
+        key=lambda row: (
+            priority_rank.get(row["priority"], 99),
+            row["milestone"],
+            row["id"],
+        ),
+    )
+
+    for row in sorted_matrix:
+        issues.append(
+            {
+                "title": f"[{row['priority'].upper()}] {row['requirement']}",
+                "priority": row["priority"],
+                "milestone": row["milestone"],
+                "category": row["category"],
+                "source_requirement_id": row["id"],
+                "description": (
+                    f"Implement requirement from section '{row['section']}'."
+                    f"\n\nRequirement: {row['requirement']}"
+                ),
+                "acceptance_criteria": [
+                    f"Requirement {row['id']} is implemented and demonstrable.",
+                    f"Tests cover the primary behavior ({row['test_hint']}).",
+                    "Documentation is updated for developer onboarding.",
+                ],
+            }
+        )
+
+    return issues
+
+
 def matrix_json_schema() -> dict[str, object]:
     return {
         "$schema": "https://json-schema.org/draft/2020-12/schema",

@@ -1,0 +1,77 @@
+from __future__ import annotations
+
+import pytest
+
+from prd_to_mvp_copilot import cli
+
+
+def test_cli_validate_with_custom_required_sections_passes(tmp_path, capsys, monkeypatch):
+    prd = tmp_path / "sample.md"
+    prd.write_text("# Problem\n# Scope\n- Must support auth\n", encoding="utf-8")
+
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "prd-mvp",
+            str(prd),
+            "--validate",
+            "--require-section",
+            "Problem",
+            "--require-section",
+            "Scope",
+        ],
+    )
+
+    cli.main()
+    captured = capsys.readouterr()
+
+    assert "Validation passed." in captured.err
+    assert "Problem, Scope" in captured.err
+
+
+def test_cli_validate_with_custom_required_sections_fails(tmp_path, capsys, monkeypatch):
+    prd = tmp_path / "sample.md"
+    prd.write_text("# Problem\n- Must support auth\n", encoding="utf-8")
+
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "prd-mvp",
+            str(prd),
+            "--validate",
+            "--require-section",
+            "Problem",
+            "--require-section",
+            "Scope",
+        ],
+    )
+
+    with pytest.raises(SystemExit) as exc:
+        cli.main()
+
+    assert exc.value.code == 2
+    captured = capsys.readouterr()
+    assert "Missing required sections: Scope" in captured.err
+    assert "Discovered sections: Problem" in captured.err
+
+
+def test_cli_writes_issue_seed_markdown(tmp_path, capsys, monkeypatch):
+    prd = tmp_path / "sample.md"
+    out = tmp_path / "generated" / "issue-seed.md"
+    prd.write_text(
+        "# Scope\n- Must support auth\n- Should show dashboard KPI\n",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["prd-mvp", str(prd), "--issues-out", str(out)],
+    )
+
+    cli.main()
+    _ = capsys.readouterr()
+
+    content = out.read_text(encoding="utf-8")
+    assert "# Generated issue seed" in content
+    assert "[HIGH] Must support auth" in content
+    assert "### Acceptance Criteria" in content

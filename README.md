@@ -8,8 +8,9 @@ Turn product requirements into runnable MVP scaffolds.
 - Task-matrix generator with category + milestone mapping + effort sizing + test hints
 - Priority inference (`high`/`medium`/`low`) from requirement language (`must`, `critical`, `should`, etc.)
 - CLI (`prd-mvp`) outputting JSON or Markdown table
-- Optional PRD section validation (`--validate`) requiring Problem/Users/Goals/Features headings
+- Optional PRD section validation (`--validate`) with default Problem/Users/Goals/Features, overridable via repeated `--require-section`
 - Optional JSON Schema export for downstream validators/contracts
+- Optional issue-seed markdown generation (`--issues-out`) for fast GitHub backlog drafting
 - Demo PRD and pytest coverage
 
 ## Quickstart
@@ -20,6 +21,10 @@ source .venv/bin/activate
 pip install -e '.[dev]'
 pytest
 prd-mvp demo/sample_prd.md --format md --schema-out demo/task_matrix.schema.json --validate
+# custom validation contract (repeat --require-section)
+prd-mvp demo/sample_prd.md --validate --require-section Problem --require-section Features
+# generate issue-seed markdown for backlog import
+prd-mvp demo/sample_prd.md --issues-out generated/issue-seed.md
 ```
 
 ## Example output
