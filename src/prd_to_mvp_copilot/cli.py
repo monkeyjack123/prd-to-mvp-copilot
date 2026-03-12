@@ -45,6 +45,11 @@ def main() -> None:
         help="Optional path to write task matrix as CSV",
     )
     parser.add_argument(
+        "--jsonl-out",
+        type=Path,
+        help="Optional path to write task matrix as JSON Lines (one row per line)",
+    )
+    parser.add_argument(
         "--issues-out",
         type=Path,
         help="Optional path to write generated issue seed markdown",
@@ -144,6 +149,12 @@ def main() -> None:
             )
             writer.writeheader()
             writer.writerows(matrix)
+
+    if args.jsonl_out:
+        args.jsonl_out.parent.mkdir(parents=True, exist_ok=True)
+        with args.jsonl_out.open("w", encoding="utf-8") as jsonl_file:
+            for row in matrix:
+                jsonl_file.write(json.dumps(row) + "\n")
 
     if args.schema_out:
         args.schema_out.write_text(json.dumps(matrix_json_schema(), indent=2) + "\n", encoding="utf-8")

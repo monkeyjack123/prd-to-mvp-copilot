@@ -241,6 +241,52 @@ def test_cli_writes_matrix_csv_file(tmp_path, capsys, monkeypatch):
     assert rows[0]["priority"] == "high"
 
 
+def test_cli_writes_matrix_jsonl_file(tmp_path, capsys, monkeypatch):
+    prd = tmp_path / "sample.md"
+    out = tmp_path / "generated" / "matrix.jsonl"
+    prd.write_text(
+        "# Scope\n- Must support auth\n- Should show dashboard KPI\n",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["prd-mvp", str(prd), "--jsonl-out", str(out)],
+    )
+
+    cli.main()
+    _ = capsys.readouterr()
+
+    lines = [line for line in out.read_text(encoding="utf-8").splitlines() if line.strip()]
+    rows = [json.loads(line) for line in lines]
+
+    assert len(rows) == 2
+    assert rows[0]["id"] == "REQ-001"
+    assert rows[1]["priority"] == "medium"
+
+
+def test_cli_jsonl_out_respects_min_priority_filter(tmp_path, capsys, monkeypatch):
+    prd = tmp_path / "sample.md"
+    out = tmp_path / "generated" / "matrix.jsonl"
+    prd.write_text(
+        "# Scope\n- Must support auth\n- Should show dashboard KPI\n- Nice-to-have copy polish\n",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["prd-mvp", str(prd), "--min-priority", "high", "--jsonl-out", str(out)],
+    )
+
+    cli.main()
+    _ = capsys.readouterr()
+
+    rows = [json.loads(line) for line in out.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+    assert len(rows) == 1
+    assert rows[0]["priority"] == "high"
+
+
 def test_cli_markdown_output_escapes_pipe_and_newline_characters(tmp_path, capsys, monkeypatch):
     prd = tmp_path / "sample.md"
     out = tmp_path / "generated" / "matrix.md"
