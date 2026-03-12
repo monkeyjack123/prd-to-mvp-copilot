@@ -29,6 +29,11 @@ def main() -> None:
         help="Optional path to write generated issue seed markdown",
     )
     parser.add_argument(
+        "--issues-json-out",
+        type=Path,
+        help="Optional path to write generated issue seed JSON",
+    )
+    parser.add_argument(
         "--validate",
         action="store_true",
         help="Validate required PRD sections (Problem, Users, Goals, Features)",
@@ -53,8 +58,9 @@ def main() -> None:
     if args.schema_out:
         args.schema_out.write_text(json.dumps(matrix_json_schema(), indent=2) + "\n", encoding="utf-8")
 
+    issues = generate_issue_seed(matrix)
+
     if args.issues_out:
-        issues = generate_issue_seed(matrix)
         lines = ["# Generated issue seed", ""]
         for i, issue in enumerate(issues, start=1):
             lines.extend(
@@ -75,6 +81,10 @@ def main() -> None:
             lines.append("")
         args.issues_out.parent.mkdir(parents=True, exist_ok=True)
         args.issues_out.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
+
+    if args.issues_json_out:
+        args.issues_json_out.parent.mkdir(parents=True, exist_ok=True)
+        args.issues_json_out.write_text(json.dumps(issues, indent=2) + "\n", encoding="utf-8")
 
     if args.validate:
         if validation.missing_sections:

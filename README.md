@@ -11,6 +11,7 @@ Turn product requirements into runnable MVP scaffolds.
 - Optional PRD section validation (`--validate`) with default Problem/Users/Goals/Features, overridable via repeated `--require-section`
 - Optional JSON Schema export for downstream validators/contracts
 - Optional issue-seed markdown generation (`--issues-out`) for fast GitHub backlog drafting
+- Optional issue-seed JSON export (`--issues-json-out`) for automation pipelines and API ingestion
 - Demo PRD and pytest coverage
 
 ## Quickstart
@@ -25,6 +26,8 @@ prd-mvp demo/sample_prd.md --format md --schema-out demo/task_matrix.schema.json
 prd-mvp demo/sample_prd.md --validate --require-section Problem --require-section Features
 # generate issue-seed markdown for backlog import
 prd-mvp demo/sample_prd.md --issues-out generated/issue-seed.md
+# generate issue-seed JSON for automation
+prd-mvp demo/sample_prd.md --issues-json-out generated/issue-seed.json
 ```
 
 ## Example output

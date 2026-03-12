@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import pytest
 
 from prd_to_mvp_copilot import cli
@@ -75,3 +77,26 @@ def test_cli_writes_issue_seed_markdown(tmp_path, capsys, monkeypatch):
     assert "# Generated issue seed" in content
     assert "[HIGH] Must support auth" in content
     assert "### Acceptance Criteria" in content
+
+
+def test_cli_writes_issue_seed_json(tmp_path, capsys, monkeypatch):
+    prd = tmp_path / "sample.md"
+    out = tmp_path / "generated" / "issue-seed.json"
+    prd.write_text(
+        "# Scope\n- Must support auth\n- Should show dashboard KPI\n",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["prd-mvp", str(prd), "--issues-json-out", str(out)],
+    )
+
+    cli.main()
+    _ = capsys.readouterr()
+
+    content = out.read_text(encoding="utf-8")
+    payload = json.loads(content)
+    assert len(payload) == 2
+    assert payload[0]["priority"] == "high"
+    assert payload[0]["source_requirement_id"] == "REQ-001"
