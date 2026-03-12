@@ -8,7 +8,7 @@ Turn product requirements into runnable MVP scaffolds.
 - Ignores list-like text inside fenced code blocks (``` / ~~~) so examples/snippets do not pollute extracted requirements
 - Task-matrix generator with category + milestone mapping + effort sizing + test hints
 - Priority inference (`high`/`medium`/`low`) from requirement language (`must`, `critical`, `should`, etc.)
-- CLI (`prd-mvp`) outputting JSON or Markdown table
+- CLI (`prd-mvp`) outputting JSON or Markdown table (Markdown cells are escaped for safe rendering when requirements include `|` or line breaks)
 - Optional matrix file export (`--matrix-out`) in either JSON or Markdown format for CI artifacts
 - Optional PRD section validation (`--validate`) with default Problem/Users/Goals/Features, overridable via repeated `--require-section`
 - Optional strict extraction guard (`--fail-on-empty`) to fail fast when no actionable requirements were parsed

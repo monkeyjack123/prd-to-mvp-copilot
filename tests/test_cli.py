@@ -217,3 +217,20 @@ def test_cli_writes_matrix_output_markdown_file(tmp_path, capsys, monkeypatch):
     assert content.startswith("| id | section | milestone")
     assert "REQ-001" in content
     assert captured.out.startswith("| id | section | milestone")
+
+
+def test_cli_markdown_output_escapes_pipe_and_newline_characters(tmp_path, capsys, monkeypatch):
+    prd = tmp_path / "sample.md"
+    out = tmp_path / "generated" / "matrix.md"
+    prd.write_text("# Scope\n- Must support OAuth | SSO\n", encoding="utf-8")
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["prd-mvp", str(prd), "--format", "md", "--matrix-out", str(out)],
+    )
+
+    cli.main()
+    _ = capsys.readouterr()
+
+    content = out.read_text(encoding="utf-8")
+    assert "Must support OAuth \\| SSO" in content

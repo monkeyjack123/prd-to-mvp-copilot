@@ -15,6 +15,14 @@ from .parser import (
 )
 
 
+def _escape_markdown_table_cell(value: object) -> str:
+    text = str(value)
+    text = text.replace("\\", "\\\\")
+    text = text.replace("|", "\\|")
+    text = text.replace("\n", "<br>")
+    return text
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate MVP task matrix from PRD markdown")
     parser.add_argument("input", type=Path, help="Path to PRD markdown")
@@ -162,9 +170,17 @@ def main() -> None:
             "|---|---|---|---|---|---|---|---|",
         ]
         for row in matrix:
-            lines.append(
-                f"| {row['id']} | {row['section']} | {row['milestone']} | {row['category']} | {row['priority']} | {row['effort']} | {row['requirement']} | {row['test_hint']} |"
-            )
+            cells = [
+                _escape_markdown_table_cell(row["id"]),
+                _escape_markdown_table_cell(row["section"]),
+                _escape_markdown_table_cell(row["milestone"]),
+                _escape_markdown_table_cell(row["category"]),
+                _escape_markdown_table_cell(row["priority"]),
+                _escape_markdown_table_cell(row["effort"]),
+                _escape_markdown_table_cell(row["requirement"]),
+                _escape_markdown_table_cell(row["test_hint"]),
+            ]
+            lines.append("| " + " | ".join(cells) + " |")
         rendered_output = "\n".join(lines)
 
     if args.matrix_out:
